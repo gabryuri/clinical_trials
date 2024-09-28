@@ -31,9 +31,8 @@ def process_disease_info(*args, **kwargs):
 
     logging.info(f"processed dataframe, starting duckdb insert into table {target_schema}.{target_table}")
 
-    create = duckdb.sql(f"CREATE SCHEMA IF NOT EXISTS {target_schema};")
-    logging.info(f"duckdb create statement result {create}")
-    duckdb.sql(f"CREATE TABLE {target_schema}.{target_table} AS SELECT * FROM df")
+    db.sql(f"CREATE SCHEMA IF NOT EXISTS {target_schema};")
+    db.sql(f"CREATE OR REPLACE TABLE {target_schema}.{target_table} AS SELECT * FROM df")
 
     logging.info("Successfully inserted data")
 
@@ -51,7 +50,7 @@ def standardize_diseases(df, column_name, standardized_col_name):
     Here is the disease:"""
     standardized_terms = []
     input_list = df[column_name].to_list()
-    fake_run = True
+    fake_run = False
 
     logging.info(f"{len(input_list)} rows to process")
 

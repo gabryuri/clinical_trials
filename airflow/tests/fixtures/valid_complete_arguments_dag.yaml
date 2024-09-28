@@ -1,0 +1,41 @@
+schedule_interval: '0 0 * * *'
+start_date: '2024-09-27'
+
+
+groups:
+  respiratory-conditions:
+    - task_id: 'clinical-trials-gov-influenza'
+      kind: 'dlt-ingestion-pipeline'
+      api_parameters: "{'query.cond': 'INFLUENZA'}"
+    
+    - task_id: 'clinical-trials-gov-covid'
+      kind: 'dlt-ingestion-pipeline'
+      api_parameters: "{'query.cond': 'COVID'}"
+
+  endocrinal-conditions:
+    - task_id: 'clinical-trials-gov-diabetes'
+      kind: 'dlt-ingestion-pipeline'
+      api_parameters: "{'query.cond': 'DIABETES'}"
+
+    - task_id: 'clinical-trials-gov-menopause'
+      kind: 'dlt-ingestion-pipeline'
+      api_parameters: "{'query.cond': 'MENOPAUSE'}"
+  
+  transformation:
+    - task_id: 'clinical-trials-gov-dbt'
+      kind: 'dbt-transformation'
+      models: 'all'
+      dependencies:
+        - clinical-trials-gov-influenza
+        - clinical-trials-gov-covid
+        - clinical-trials-gov-diabetes
+        - clinical-trials-gov-menopause
+  
+    - task_id: 'clinical-trials-gov-openai-standardize-conditions'
+      kind: 'llm-processing'
+      source_table: 'dim_conditions'
+      source_schema: 'clinical_trials_preprocessed'
+      target_table: 'dim_conditions_processed'
+      target_schema: 'clinical_trials_processed'
+      dependencies:
+        - 'clinical-trials-gov-dbt'

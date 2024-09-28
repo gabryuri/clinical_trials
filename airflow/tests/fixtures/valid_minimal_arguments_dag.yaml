@@ -1,0 +1,15 @@
+schedule_interval: '0 0 * * *'
+start_date: '2023-11-09'
+
+tasks:
+  - task_id: 'example-start'
+    kind: 'lambda'
+    lambda_function: 'lambda-name'
+
+  - task_id: 'example-container-task'
+    kind: 'container'
+    image: 'ubuntu'
+
+  - task_id: 'example-dms-replication-task'
+    kind: 'dms-replication-task'
+    replication_task: 'my-replication-task-created-in-the-hub'  

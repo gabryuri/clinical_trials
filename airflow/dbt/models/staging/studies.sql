@@ -1,0 +1,17 @@
+{{ config(materialized='table') }}
+
+select
+_dlt_id,
+protocol_section__identification_module__nct_id,
+protocol_section__identification_module__organization__full_name,
+protocol_section__identification_module__organization__class,
+protocol_section__identification_module__brief_title,
+protocol_section__status_module__overall_status,
+protocol_section__status_module__study_first_submit_date,
+protocol_section__sponsor_collaborators_module__lead_sponsor__name,
+protocol_section__sponsor_collaborators_module__lead_sponsor__class,
+protocol_section__design_module__study_type,
+protocol_section__design_module__design_info__allocation,
+protocol_section__design_module__design_info__intervention_model,
+protocol_section__identification_module__acronym
+from {{ source('clinical_trials', 'studies') }}

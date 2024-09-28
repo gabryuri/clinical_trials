@@ -1,0 +1,92 @@
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: always
+  
+  airflow-init:
+    # image: apache/airflow:2.7.3
+    build: .
+    entrypoint: /opt/airflow/scripts/entrypoint.sh
+    user: "${AIRFLOW_UID:-50000}:0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+    - ${AIRFLOW_PROJ_DIR:-.}/airflow/scripts:/opt/airflow/scripts
+    env_file:
+      - docker.env
+
+  airflow-webserver:
+    dns:
+    - 8.8.8.8
+    - 4.4.4.4
+    - 8.8.4.4
+    # image: apache/airflow:2.7.3
+    build: .
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    user: "${AIRFLOW_UID:-50000}:0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    ports:
+      - "8080:8080"
+    volumes:
+    - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/airflow/dbt:/opt/airflow/dbt
+    - ${AIRFLOW_PROJ_DIR:-.}/airflow/db:/opt/airflow/db
+    - ${AIRFLOW_PROJ_DIR:-.}/db:/opt/airflow/db
+    env_file:
+      - docker.env
+  
+  airflow-scheduler:
+    dns:
+    - 8.8.8.8
+    - 4.4.4.4
+    - 8.8.4.4
+    # image: apache/airflow:2.7.3
+    build: .
+    command: scheduler
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    user: "${AIRFLOW_UID:-50000}:0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    volumes:
+    - ${AIRFLOW_PROJ_DIR:-.}/airflow/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/airflow/dbt:/opt/airflow/dbt
+    - ${AIRFLOW_PROJ_DIR:-.}/airflow/db:/opt/airflow/db
+    env_file:
+      - docker.env
+
+volumes:
+  postgres-db-volume:

@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: fact_studies_conditions
+    description: "Conditions related to studies"
+    config:
+      schema: preprocessed
+    columns:
+      - name: term
+        tests:
+          - null_percentage:
+              threshold: 0.1
+  
+  - name: dim_conditions
+    description: "Conditions deduplified"
+    config:
+      schema: preprocessed
+    columns:
+      - name: condition_id
+        tests:
+          - not_null

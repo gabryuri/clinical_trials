@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: clinical_trials
+    database: duckdb
+    tables:
+      - name: studies
+      - name: studies__derived_section__condition_browse_module__ancestors
+
+
+# models:
+#   - name: trials
+#     columns:
+#       - name: protocol_section__identification_module__nct_id
+#         description: ""
+        # tests:
+        #   - unique
+        #   - not_null

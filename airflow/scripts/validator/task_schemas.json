@@ -1,0 +1,39 @@
+{
+    "dlt-ingestion-pipeline": {
+        "type": "object",
+        "properties": {
+            "task_id": {"type": "string"},
+            "kind": {"type": "string"},
+            "api_parameters": {"type": "string"},
+            "dependencies": {"type": "array", "items": {"type": "string"}}
+
+        },
+        "required": ["task_id", "kind", "api_parameters"],
+        "additionalProperties": false
+    },
+    "dbt-transformation": {
+        "type": "object",
+        "properties": {
+            "task_id": {"type": "string"},
+            "kind": {"type": "string"},
+            "models": {"type": "string"},
+            "dependencies":{"type": "array", "items": {"type": "string"}}
+        },
+        "required": ["task_id", "kind"],
+        "additionalProperties": false
+    },
+    "llm-processing": {
+        "type": "object",
+        "properties": {
+            "task_id": {"type": "string"},
+            "kind": {"type": "string"},
+            "source_table": {"type": "string"},
+            "source_schema": {"type": "string"},
+            "target_schema": {"type": "string"},
+            "target_table": {"type": "string"},
+            "dependencies":{"type": "array", "items": {"type": "string"}}
+        },
+        "required": ["task_id", "kind", "source_table", "source_schema", "target_table", "target_schema"],
+        "additionalProperties": false
+    }
+}

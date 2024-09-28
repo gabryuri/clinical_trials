@@ -1,0 +1,10 @@
+{
+    "type": "object",
+    "properties": {
+        "schedule_interval": {"type": "string"},
+        "start_date": {"type": "string", "format": "date"},
+        "groups": {"type": "object"}
+    },
+    "required": ["schedule_interval", "start_date", "groups"],
+    "additionalProperties": false
+}

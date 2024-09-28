@@ -1,0 +1,10 @@
+dbt_trially:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      threads: 1
+      path: /opt/airflow/db/duckdb.db
+      schema: clinical_trials
+      database: duckdb
+    

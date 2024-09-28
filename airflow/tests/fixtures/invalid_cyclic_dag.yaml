@@ -1,0 +1,17 @@
+schedule_interval: '0 0 * * *'
+start_date: '2024-09-27'
+
+groups:
+  cyclic_group:
+    - task_id: 'example-start'
+      kind: 'dlt-ingestion-pipeline'
+      api_parameters: "{'param': 'test'}"
+      dependencies: 
+        - example-end
+
+    - task_id: 'example-end'
+      kind: 'dlt-ingestion-pipeline'
+      api_parameters: "{'param': 'test'}"
+      dependencies:
+        - example-start
+

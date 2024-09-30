@@ -29,7 +29,12 @@ test:
 .PHONY: deploy up
 deploy: up  
 up:
+	mkdir -p ./airflow/dags ./airflow/logs
+	sudo chmod -R 777 airflow/dags/
+	sudo chmod -R 777 airflow/logs/
 	docker compose down && docker compose build && docker compose up -d
-	docker exec -u root -ti clinical_trials-airflow-scheduler-1 chmod -R 777 /opt/airflow/
-	
+
+.PHONY: present
+present:
+	streamlit run streamlit/present_conditions.py
 

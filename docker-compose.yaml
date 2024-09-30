@@ -16,7 +16,6 @@ services:
     restart: always
   
   airflow-init:
-    # image: apache/airflow:2.7.3
     build: .
     entrypoint: /opt/airflow/scripts/entrypoint.sh
     user: "${AIRFLOW_UID:-50000}:0"
@@ -29,11 +28,6 @@ services:
       - docker.env
 
   airflow-webserver:
-    dns:
-    - 8.8.8.8
-    - 4.4.4.4
-    - 8.8.4.4
-    # image: apache/airflow:2.7.3
     build: .
     command: webserver
     healthcheck:
@@ -55,16 +49,10 @@ services:
     - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/airflow/dbt:/opt/airflow/dbt
     - ${AIRFLOW_PROJ_DIR:-.}/airflow/db:/opt/airflow/db
-    - ${AIRFLOW_PROJ_DIR:-.}/db:/opt/airflow/db
     env_file:
       - docker.env
   
   airflow-scheduler:
-    dns:
-    - 8.8.8.8
-    - 4.4.4.4
-    - 8.8.4.4
-    # image: apache/airflow:2.7.3
     build: .
     command: scheduler
     healthcheck:

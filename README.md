@@ -58,9 +58,35 @@ This yaml creates the DAG in the first image.
 
 
 ## Code
+### Ingestion 
+The code for data ingestion through `dlt` is stored under [airflow/dags/dag_creation_engine/dlt/ingestor.py](https://github.com/gabryuri/clinical_trials/tree/main/airflow/dags/dag_creation_engine/dlt/ingestor.py). It is a simple pipeline from the API, and can handle the pagination. For simplicity, the pagination is commented out and only one request will be made for each ingestion task. 
+
+
+## LLM api calls
+Under [airflow/dags/dag_creation_engine/openai/llm_process.py](https://github.com/gabryuri/clinical_trials/tree/main/airflow/dags/dag_creation_engine/openai/llm_process.py) a **very simple** script was implemented. This code is just an ad-hoc example and is not generic.
+
+### Dynamic DAG creation
 All python code is stored under [airflow/dags/dag_creation_engine](https://github.com/gabryuri/clinical_trials/tree/main/airflow/dags/dag_creation_engine) and the scripts `dag_factory.py` and `task_factory.py` are responsible for translating YAML configuration files into DAGs.
 
-The code may be tested through `make test`. 
+This factory is an example that is meant to lower the technical threshold for airflow users and standardize the data pipelines.
+
+By running `make validate-dags`, one is able to identify .yaml definition errors and fix them accordingly, for example: 
+
+```
+-----------VALIDATION FAILED-----------
+
+Errors in test-dag.yaml:
+     - Cyclic dependency detected in DAG test-dag.yaml.
+     - Task 'clinical-trials-gov-influenza' has an invalid dependency: 'this_task_does_not_exist'
+
+make: *** [Makefile:13: validate-dags] Error 1
+```
+## DBT
+A simple modelling approach was taken within DBT, with some example [custom testing](https://github.com/gabryuri/clinical_trials/airflow/dbt/tests/generic/null_percentage.sql) on the loaded data.
+
+## Tests
+
+The code for both dag creation engine and dag validation may be tested through `make test`. 
 
 
 ## Data Modelling and results
@@ -79,6 +105,7 @@ It is important to note that this is not a production environment but a simple e
 - Using another database (here, DuckDB is used only for practice purposes)
 - Improving the flexibility of the .yaml templates by adding more parameters
 - The LLM API code is ad-hoc and should be refactored into something generic that can be used for other purposes.
+- Adding proper CICD pipelines to validate linting, .yaml files through `make validate-dags` and deploy the desired DAG changes to the needed environments.
 
 
 ## Other

@@ -20,13 +20,13 @@ def clinical_trials(params="{'query.cond': 'COVID'}"):
         "client": {"base_url": "https://clinicaltrials.gov/api/v2"},
         "resource_defaults": {
             "primary_key": "protocol_section__identification_module__nct_id",
-            "write_disposition": "replace",
+            "write_disposition": "append",
             "endpoint": {
                 "params": {
                     "pageSize": 1000,
                 },
                 "paginator": {"type": "single_page"},
-                # Commenting this out - for conveniency we will just load one page and use replace instead of merge
+                # Commenting this out - for conveniency we will just load one page and use append instead of merge
                 # "paginator": {
                 #     "type": "cursor",
                 #     "cursor_path": "nextPageToken",

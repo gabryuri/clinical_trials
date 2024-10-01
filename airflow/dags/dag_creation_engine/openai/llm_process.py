@@ -44,7 +44,7 @@ def standardize_diseases(df, column_name, standardized_col_name):
     )
     logging.info(f"starting OpenAI prompts")
 
-    base_prompt = """I will give you a bread description of a disease. 
+    base_prompt = """I will give you a broad description of a disease. 
     I'd like to classify them so that similar diseases get classified under the same disease name.
     Example: input  Urogenital Diseases needs to yield the ICD standard for Urogenital Diseases.
     Here is the disease:"""

@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 HOME = os.environ["AIRFLOW_HOME"]
 dbt_path = os.path.join(HOME, "dbt")
-manifest_path = os.path.join(dbt_path, "target/manifest.json")
 
 
 def create_tasks(dag, dag_yaml):

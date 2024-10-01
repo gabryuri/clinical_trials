@@ -41,6 +41,27 @@ class TestDAGValidator(unittest.TestCase):
         )
         assert errors == ["Task 'clinical-trials-gov-covid' has an invalid dependency: 'non-existent-task'"]
 
+    def test_invalid_missing_arguments_dag(self):
+        errors = validate_yaml(
+            f"{build_test_base_path()}/fixtures/invalid_missing_arguments_dag.yaml",
+            self.dag_schema_path,
+            self.task_schema_path,
+        )
+        assert len(errors) == 1
+        assert "Error in task 'example-start': 'api_parameters' is a required property" in errors[0]
+
+    def test_invalid_extra_arguments_dag(self):
+        errors = validate_yaml(
+            f"{build_test_base_path()}/fixtures/invalid_extra_arguments_dag.yaml",
+            self.dag_schema_path,
+            self.task_schema_path,
+        )
+        assert (
+            "Error in task 'example-start': Additional properties are not allowed ('this_argument_will_break_the_validator' was unexpected)"
+            in errors[0]
+        )
+        assert len(errors) == 1
+
 
 if __name__ == "__main__":
     unittest.main()

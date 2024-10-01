@@ -6,10 +6,11 @@ help:
 	@echo "  lint            - Run the Black linter with a line length of 120"
 	@echo "  test            - Run unit tests with pytest"
 	@echo "  deploy          - Deploy the application (aliases: up)"
+	@echo "  present         - Present data with streamlit app"
 
 .PHONY: validate-dags
 validate-dags:
-	python3 airflow/scripts/validator/validate_dags.py
+	cd airflow && python3 scripts/validator/validate_dags.py
 
 .PHONY: setup-dev
 setup-dev:

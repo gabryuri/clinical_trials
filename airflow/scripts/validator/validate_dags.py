@@ -8,6 +8,7 @@ from jsonschema import validate
 from glob import glob
 
 DAGS_DIR = "/".join([os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "dags"])
+print(glob(os.path.join(DAGS_DIR, "*.yaml")))
 
 
 class DAGConsistencyException(Exception):
@@ -51,10 +52,11 @@ def is_cyclic_util(task_id, adjacency_list, visited, rec_stack):
 
 def is_cyclic(dag_config):
     adjacency_list = {}
-    for task_group in dag_config["groups"]:
-        for task_cfg in dag_config["groups"].get(task_group):
-            task_id = task_cfg["task_id"]
-            adjacency_list[task_id] = task_cfg.get("dependencies", [])
+    tasks = get_tasks_from_config(dag_config)
+
+    for task in tasks:
+        task_id = task["task_id"]
+        adjacency_list[task_id] = task.get("dependencies", [])
 
     # adjacency_list = {task["task_id"]: task.get("dependencies", []) for task in dag_config["tasks"]}
     visited = set()
@@ -80,6 +82,13 @@ def validate_task(task, task_schemas):
     validate(instance=task, schema=task_schemas[kind])
 
 
+def get_tasks_from_config(dag_config):
+    tasks = []
+    for task_group in dag_config["groups"]:
+        tasks.extend([task_cfg for task_cfg in dag_config["groups"].get(task_group)])
+    return tasks
+
+
 def validate_yaml(yaml_file_path, dag_schema_path, task_schema_path):
     dag_schema = load_schema(dag_schema_path)
     task_schemas = load_schema(task_schema_path)
@@ -87,15 +96,16 @@ def validate_yaml(yaml_file_path, dag_schema_path, task_schema_path):
     file_errors = []
 
     try:
-        # logger.info(f"Validating file {yaml_file_path}")
+        logger.info(f"Validating file {yaml_file_path}")
         with open(yaml_file_path, "r") as file:
             yaml_data = yaml.safe_load(file)
 
         validate(instance=yaml_data, schema=dag_schema)
         file_errors.extend(validate_dag_dependencies(dag_config=yaml_data, dag_name=dag_name))
+        tasks = get_tasks_from_config(yaml_data)
 
-        # logger.info(f"Dependencies and schema validated for {dag_name}, now validating tasks")
-        for task in yaml_data.get("tasks", []):
+        logger.info(f"Dependencies and schema validated for {dag_name}, now validating tasks")
+        for task in tasks:
             try:
                 validate_task(task, task_schemas)
             except (jsonschema.exceptions.ValidationError, ValueError) as e:
@@ -144,6 +154,7 @@ if __name__ == "__main__":
         # all_errors.extend(validate_yaml(yaml_path, dag_schema_path, task_schema_path))
     else:
         for yaml_file in glob(os.path.join(DAGS_DIR, "*.yaml")):
+            logger.info(f"validating yaml {yaml_file}")
             file_errors = validate_yaml(yaml_file, dag_schema_path, task_schema_path)
             if file_errors:
                 error_dict[os.path.basename(yaml_file)] = file_errors
